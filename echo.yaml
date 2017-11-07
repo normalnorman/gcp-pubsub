@@ -1,25 +1,21 @@
-apiVersion: extensions/v1beta1
-kind: ReplicaSet
+apiVersion: apps/v1beta1 # for versions before 1.8.0 use apps/v1beta1
+kind: Deployment
 metadata:
-  name: container-pubsub
+  name: gcp-pubsub
+  labels:
+    app: gcp-pubsub
 spec:
   replicas: 3
+  selector:
+    matchLabels:
+      app: gcp-pubsub
   template:
     metadata:
       labels:
-        app: container-pubsub
-      name: container-pubsub
+        app: gcp-pubsub
     spec:
       containers:
-        - name: container-pubsub
-          image: "gcr.io/google.com/container-pubsub/container_pubsub"
-          env:
-            - name: "GOOGLE_APPLICATION_CREDENTIALS"
-              value: "/var/run/secret/cloud.google.com/service-account.json"
-          volumeMounts:
-            - name: "service-account"
-              mountPath: "/var/run/secret/cloud.google.com"
-      volumes:
-        - name: "service-account"
-          secret: 
-            secretName: "service-account"
+      - name: gcp-pubsub
+        image: gcr.io/google.com/container-pubsub/gcp-pubsub
+        ports:
+        - containerPort: 80
